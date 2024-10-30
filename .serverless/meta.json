@@ -1,0 +1,139 @@
+{
+  "C:\\Users\\rondana\\api-serveless": {
+    "versionSfCore": null,
+    "versionFramework": "4.4.7",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeServiceName": null,
+    "servicePath": "C:\\Users\\rondana\\api-serveless",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "serverless-starwars-api",
+      "frameworkVersion": "4",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs18.x",
+        "region": "us-east-1",
+        "environment": {
+          "DYNAMODB_TABLE": "serverless-starwars-api-dev"
+        },
+        "iam": {
+          "role": {
+            "statements": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:Query",
+                  "dynamodb:Scan",
+                  "dynamodb:GetItem",
+                  "dynamodb:PutItem"
+                ],
+                "Resource": "arn:aws:dynamodb:${aws:region}:*:table/serverless-starwars-api-dev"
+              }
+            ]
+          }
+        }
+      },
+      "functions": {
+        "getPeople": {
+          "handler": "src/handlers/getPeople.handler",
+          "events": [
+            {
+              "http": {
+                "path": "/personas",
+                "method": "get",
+                "cors": true
+              }
+            }
+          ]
+        },
+        "createCharacter": {
+          "handler": "src/handlers/createCharacter.handler",
+          "events": [
+            {
+              "http": {
+                "path": "/personaje",
+                "method": "post",
+                "cors": true
+              }
+            }
+          ]
+        },
+        "getCharacters": {
+          "handler": "src/handlers/getCharacters.handler",
+          "events": [
+            {
+              "http": {
+                "path": "/personajes",
+                "method": "get",
+                "cors": true
+              }
+            }
+          ]
+        }
+      },
+      "resources": {
+        "Resources": {
+          "CharactersTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "serverless-starwars-api-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "BillingMode": "PAY_PER_REQUEST"
+            }
+          }
+        }
+      },
+      "plugins": [
+        "serverless-offline"
+      ]
+    },
+    "serviceRawFile": "# configuracion del serveless \r\nservice: serverless-starwars-api\r\n\r\nframeworkVersion: '4'\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n  region: us-east-1\r\n  environment:\r\n    DYNAMODB_TABLE: ${self:service}-${sls:stage}\r\n  iam:\r\n    role:\r\n      statements:\r\n        - Effect: Allow\r\n          Action:\r\n            - dynamodb:Query\r\n            - dynamodb:Scan\r\n            - dynamodb:GetItem\r\n            - dynamodb:PutItem\r\n          Resource: \"arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}\"\r\n\r\nfunctions:\r\n  getPeople:\r\n    handler: src/handlers/getPeople.handler\r\n    events:\r\n      - http:\r\n          path: /personas\r\n          method: get\r\n          cors: true\r\n  \r\n  createCharacter:\r\n    handler: src/handlers/createCharacter.handler\r\n    events:\r\n      - http:\r\n          path: /personaje\r\n          method: post\r\n          cors: true\r\n\r\n  getCharacters:\r\n    handler: src/handlers/getCharacters.handler\r\n    events:\r\n      - http:\r\n          path: /personajes\r\n          method: get\r\n          cors: true\r\n\r\nresources:\r\n  Resources:\r\n    CharactersTable:\r\n      Type: 'AWS::DynamoDB::Table'\r\n      Properties:\r\n        TableName: ${self:provider.environment.DYNAMODB_TABLE}\r\n        AttributeDefinitions:\r\n          - AttributeName: id\r\n            AttributeType: S\r\n        KeySchema:\r\n          - AttributeName: id\r\n            KeyType: HASH\r\n        BillingMode: PAY_PER_REQUEST\r\n\r\nplugins:\r\n  - serverless-offline\r\n",
+    "command": [
+      "offline",
+      "start"
+    ],
+    "options": {},
+    "error": {
+      "message": "Failed to resolve variable 'region' with resolver 'ssm' and provider 'default-aws-credential-resolver': Error: AWS credentials missing or invalid. Original error from AWS: Could not load credentials from any providers",
+      "stack": "Error: Failed to resolve variable 'region' with resolver 'ssm' and provider 'default-aws-credential-resolver': Error: AWS credentials missing or invalid. Original error from AWS: Could not load credentials from any providers\n    at #resolveKey (file:///C:/Users/rondana/.serverless/releases/4.4.7/package/dist/sf-core.js:693:50294)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async _ResolverManager.resolve (file:///C:/Users/rondana/.serverless/releases/4.4.7/package/dist/sf-core.js:693:55687)\n    at async #handlePlaceholderNode (file:///C:/Users/rondana/.serverless/releases/4.4.7/package/dist/sf-core.js:693:54456)\n    at async file:///C:/Users/rondana/.serverless/releases/4.4.7/package/dist/sf-core.js:693:52448\n    at async processNodeAndHandleCompletion (file:///C:/Users/rondana/.serverless/releases/4.4.7/package/dist/sf-core.js:693:43090)",
+      "code": "RESOLVER_RESOLVE_VARIABLE_ERROR"
+    },
+    "machineId": "4757f4c053af7557e46fd658ade69908",
+    "stage": "dev",
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "977abbb7-2105-4bfe-b5de-09ce9aacdad5",
+    "orgName": "moises1008",
+    "userId": "MSY4ntJDCFffCvR4mL",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "moises1008",
+    "subscription": null,
+    "userEmail": "drnrondan@gmail.com",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}

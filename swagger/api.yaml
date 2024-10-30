@@ -1,0 +1,209 @@
+openapi: 3.0.0
+info:
+  title: Star Wars API
+  description: API Serverless para gestión de personajes de Star Wars
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@example.com
+
+servers:
+  - url: https://{apiId}.execute-api.{region}.amazonaws.com/{stage}
+    variables:
+      apiId:
+        default: your-api-id
+        description: API Gateway ID
+      region:
+        default: us-east-1
+        description: AWS Region
+      stage:
+        default: dev
+        description: Deployment stage
+
+paths:
+  /personas:
+    get:
+      summary: Obtener personas de SWAPI
+      description: Obtiene y traduce la lista de personas desde la API de Star Wars
+      operationId: getPeople
+      tags:
+        - SWAPI
+      responses:
+        '200':
+          description: Lista de personas traducida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  personas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Personaje'
+        '500':
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /personaje:
+    post:
+      summary: Crear nuevo personaje
+      description: Crea un nuevo personaje en la base de datos
+      operationId: createCharacter
+      tags:
+        - Personajes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonajeInput'
+      responses:
+        '201':
+          description: Personaje creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonajeCompleto'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /personajes:
+    get:
+      summary: Obtener personajes guardados
+      description: Obtiene la lista de personajes almacenados en DynamoDB
+      operationId: getCharacters
+      tags:
+        - Personajes
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Número máximo de resultados a devolver
+        - in: query
+          name: lastEvaluatedKey
+          schema:
+            type: string
+          description: Token de paginación para la siguiente página
+      responses:
+        '200':
+          description: Lista de personajes obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  personajes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PersonajeCompleto'
+                  nextPageToken:
+                    type: string
+                    description: Token para obtener la siguiente página de resultados
+        '500':
+          description: Error del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    PersonajeInput:
+      type: object
+      required:
+        - nombre
+        - altura
+        - peso
+        - colorCabello
+        - colorPiel
+        - colorOjos
+        - añoNacimiento
+        - genero
+      properties:
+        nombre:
+          type: string
+          description: Nombre del personaje
+          example: "Luke Skywalker"
+        altura:
+          type: string
+          description: Altura en centímetros
+          example: "172"
+        peso:
+          type: string
+          description: Peso en kilogramos
+          example: "77"
+        colorCabello:
+          type: string
+          description: Color de cabello
+          example: "rubio"
+        colorPiel:
+          type: string
+          description: Color de piel
+          example: "claro"
+        colorOjos:
+          type: string
+          description: Color de ojos
+          example: "azul"
+        añoNacimiento:
+          type: string
+          description: Año de nacimiento
+          example: "19BBY"
+        genero:
+          type: string
+          description: Género del personaje
+          example: "masculino"
+
+    PersonajeCompleto:
+      allOf:
+        - $ref: '#/components/schemas/PersonajeInput'
+        - type: object
+          required:
+            - id
+            - createdAt
+            - updatedAt
+          properties:
+            id:
+              type: string
+              description: Identificador único del personaje
+              example: "123e4567-e89b-12d3-a456-426614174000"
+            createdAt:
+              type: integer
+              description: Timestamp de creación
+              example: 1635724800000
+            updatedAt:
+              type: integer
+              description: Timestamp de última actualización
+              example: 1635724800000
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Mensaje de error
+          example: "Error al procesar la solicitud"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key para autenticación

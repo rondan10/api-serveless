@@ -1,0 +1,63 @@
+# configuracion del serveless 
+service: serverless-starwars-api
+
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${sls:stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+          Resource: "arn:aws:dynamodb:${aws:region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  getPeople:
+    handler: src/handlers/getPeople.handler
+    events:
+      - http:
+          path: /personas
+          method: get
+          cors: true
+  
+  createCharacter:
+    handler: src/handlers/createCharacter.handler
+    events:
+      - http:
+          path: /personaje
+          method: post
+          cors: true
+
+  getCharacters:
+    handler: src/handlers/getCharacters.handler
+    events:
+      - http:
+          path: /personajes
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    CharactersTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+plugins:
+  - serverless-offline
