@@ -1,4 +1,3 @@
-# configuracion del serveless 
 service: serverless-starwars-api
 
 frameworkVersion: '4'

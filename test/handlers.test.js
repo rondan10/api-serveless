@@ -52,7 +52,7 @@ describe('Character Handlers', () => {
 
     test('should return 400 for invalid character data', async () => {
       const event = {
-        body: JSON.stringify({ nombre: 'Luke' }) // Missing required fields
+        body: JSON.stringify({ nombre: 'Luke' })
       };
 
       const response = await createCharacterHandler(event);
